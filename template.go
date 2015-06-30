@@ -36,12 +36,12 @@ func (ac *ActiveContext) Render403() {
 	ac.Template.Render(TemplatePath403, "", nil)
 }
 
-type AceRender struct {
-	Options *ace.Options
+type AceRenderer struct {
+	Options map[string]interface{}
 }
 
 func (a *AceRender) GetOptions(paths []string) {
-	return a.Options
+	return ace.Options(a.Options)
 }
 
 func (a *AceRender) Load(paths []string) (*template.Template, error) {
