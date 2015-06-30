@@ -3,6 +3,7 @@ package activecontext
 import (
 	"encoding/json"
 	"runtime"
+	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/zenazn/goji/web/middleware"
