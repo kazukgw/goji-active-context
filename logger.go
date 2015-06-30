@@ -1,6 +1,6 @@
-package appctx
+package activecontext
 
-func (ac *AppContext) InfoLog(msg string) {
+func (ac *ActiveContext) InfoLog(msg string) {
 	if ac.Logger == nil {
 		return
 	}
@@ -11,7 +11,7 @@ func (ac *AppContext) InfoLog(msg string) {
 	})
 }
 
-func (ac *AppContext) ErrorLog(e error) {
+func (ac *ActiveContext) ErrorLog(e error) {
 	if ac.Logger == nil {
 		return
 	}
@@ -32,7 +32,7 @@ func (ac *AppContext) ErrorLog(e error) {
 	}
 }
 
-func (ac *AppContext) ParamsLog(params interface{}) {
+func (ac *ActiveContext) ParamsLog(params interface{}) {
 	if ac.Logger == nil {
 		return
 	}

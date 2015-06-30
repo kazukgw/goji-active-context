@@ -1,11 +1,11 @@
-package appctx
+package activecontext
 
 import (
 	"encoding/json"
 	"net/http"
 )
 
-func (ac *AppContext) Json(d interface{}) {
+func (ac *ActiveContext) Json(d interface{}) {
 	json, err := json.Marshal(d)
 	if err != nil {
 		http.Error(ac.Writer, err.Error(), http.StatusInternalServerError)
@@ -16,7 +16,7 @@ func (ac *AppContext) Json(d interface{}) {
 	ac.Writer.Write(json)
 }
 
-func (ac *AppContext) ErrorJson(e interface{}) {
+func (ac *ActiveContext) ErrorJson(e interface{}) {
 	ej := map[string]interface{}{
 		"status":  "error",
 		"message": e,
@@ -24,7 +24,7 @@ func (ac *AppContext) ErrorJson(e interface{}) {
 	ac.Json(ej)
 }
 
-func (ac *AppContext) SuccessJson(d interface{}) {
+func (ac *ActiveContext) SuccessJson(d interface{}) {
 	sj := map[string]interface{}{
 		"status": "success",
 		"data":   d,

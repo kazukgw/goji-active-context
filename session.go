@@ -1,6 +1,6 @@
-package appctx
+package activecontext
 
-func (ac *AppContext) SaveSession(sess map[string]interface{}) error {
+func (ac *ActiveContext) SaveSession(sess map[string]interface{}) error {
 	for k, v := range sess {
 		ac.Session.Values[k] = v
 	}

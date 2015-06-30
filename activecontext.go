@@ -1,4 +1,4 @@
-package appctx
+package activecontext
 
 import (
 	"html/template"
@@ -8,7 +8,7 @@ import (
 	"github.com/zenazn/goji/web"
 )
 
-type AppContext struct {
+type ActiveContext struct {
 	Context web.C
 	Writer  http.ResponseWriter
 	Request *http.Request
@@ -40,12 +40,23 @@ func New(
 	c web.C,
 	w http.ResponseWriter,
 	r *http.Request,
-) *AppContext {
+) *ActiveContext {
 	env := c.Env["env"].(string)
-	tmpl, _ := c.Env["template"].(Template)
-	sess, _ := c.Env["session"].(Session)
-	logger, _ := c.Env["logger"].(Logger)
-	return &AppContext{
+	tmpl, ok := c.Env["template"].(Template)
+	if !ok {
+		tmpl = DefaultTemplate
+	}
+
+	sess, ok := c.Env["session"].(Session)
+	if !ok {
+		sess = DefaultSession
+	}
+
+	logger, ok := c.Env["logger"].(Logger)
+	if !ok {
+		logger = DefaultLogger
+	}
+	return &ActiveContext{
 		Contect:  c,
 		Writer:   w,
 		Request:  r,
@@ -56,15 +67,15 @@ func New(
 	}
 }
 
-func (ac *AppContext) Head(code int) {
+func (ac *ActiveContext) Head(code int) {
 	ac.Writer.WriteHeader(code)
 }
 
-func (ac *AppContext) SendFile(path string) {
+func (ac *ActiveContext) SendFile(path string) {
 	http.ServeFile(ac.Writer, ac.Request, path)
 }
 
-func (ac *AppContext) Redirect(path string, status int) {
+func (ac *ActiveContext) Redirect(path string, status int) {
 	http.Redirect(
 		ac.Writer,
 		ac.Request,
@@ -77,14 +88,14 @@ var Path500 = "/500"
 var Path404 = "/404"
 var Path403 = "/403"
 
-func (ac *AppContext) RedirectTo500Page() {
+func (ac *ActiveContext) RedirectTo500Page() {
 	http.Redirect(ac.Writer, ac.Request, Path500, http.StatusFound)
 }
 
-func (ac *AppContext) RedirectTo404Page() {
+func (ac *ActiveContext) RedirectTo404Page() {
 	http.Redirect(ac.Writer, ac.Request, Path404, http.StatusFound)
 }
 
-func (ac *AppContext) RedirectTo403Page() {
+func (ac *ActiveContext) RedirectTo403Page() {
 	http.Redirect(ac.Writer, ac.Request, Path403, http.StatusFound)
 }

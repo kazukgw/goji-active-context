@@ -1,4 +1,4 @@
-package appctx
+package activecontext
 
 import (
 	"html/template"
@@ -7,7 +7,7 @@ import (
 	"github.com/yosssi/ace"
 )
 
-func (ac *AppContext) RenderTemplate(data interface{}, paths []string) error {
+func (ac *ActiveContext) RenderTemplate(data interface{}, paths []string) error {
 	tpl, err := ac.Template.Load(basePath, innerPath, a.Options)
 	if err != nil {
 		ac.ErrorLog(err)
@@ -24,15 +24,15 @@ var TemplatePath500 = "views/error/500"
 var TemplatePath404 = "views/error/404"
 var TemplatePath403 = "views/error/403"
 
-func (ac *AppContext) Render500() {
+func (ac *ActiveContext) Render500() {
 	ac.Template.Render(TemplatePath500, "", nil)
 }
 
-func (ac *AppContext) Render404() {
+func (ac *ActiveContext) Render404() {
 	ac.Template.Render(TemplatePath404, "", nil)
 }
 
-func (ac *AppContext) Render403() {
+func (ac *ActiveContext) Render403() {
 	ac.Template.Render(TemplatePath403, "", nil)
 }
 
