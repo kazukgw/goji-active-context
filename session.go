@@ -1,14 +1,25 @@
 package activecontext
 
-func (ac *ActiveContext) SaveSession(sess map[string]interface{}) error {
-	for k, v := range sess {
-		ac.Session.Values[k] = v
-	}
+import (
+	"github.com/gorilla/sessions"
+)
 
-	if serr := ac.Session.Save(ac.Request, ac.Writer); serr != nil {
-		ac.ErrorLog(serr)
-		ac.RedirectTo500Page()
-		return serr
+func (ac *ActiveContext) SaveSession() error {
+	if err := ac.Session.Save(ac.Request, ac.Writer); err != nil {
+		ac.ErrorLog(err)
+		return err
 	}
 	return nil
+}
+
+type GorillaSession struct {
+	*sessions.Session
+}
+
+func (s *GorillaSession) Get(key string) interface{} {
+	return s.Session.Values[key]
+}
+
+func (s *GorillaSession) Set(key string, value interface{}) {
+	s.Session.Values[key] = value
 }

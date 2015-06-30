@@ -1,9 +1,14 @@
 package activecontext
 
+import (
+	"encoding/json"
+	"runtime"
+
+	"github.com/Sirupsen/logrus"
+	"github.com/zenazn/goji/web/middleware"
+)
+
 func (ac *ActiveContext) InfoLog(msg string) {
-	if ac.Logger == nil {
-		return
-	}
 	rID := middleware.GetReqID(ac.Context)
 	ac.Logger.InfoWithFields(msg, map[string]interface{}{
 		"req_id": rID,
@@ -12,33 +17,33 @@ func (ac *ActiveContext) InfoLog(msg string) {
 }
 
 func (ac *ActiveContext) ErrorLog(e error) {
-	if ac.Logger == nil {
-		return
-	}
 	rID := middleware.GetReqID(ac.Context)
 	if ac.Env == EnvDevelopment {
 		stack := make([]byte, 4096)
 		read := runtime.Stack(stack, false)
 		ac.Logger.ErrorWithFields(e, map[string]interface{}{
+			"datetime":   time.Now().Format("2006-01-02 15:04:05"),
 			"req_id":     rID,
 			"uri":        ac.Request.RequestURI,
 			"stacktrace": string(stack[:read]),
 		})
 	} else {
 		ac.Logger.ErrorWithFields(e, map[string]interface{}{
-			"req_id": rID,
-			"uri":    ac.Request.RequestURI,
+			"datetime": time.Now().Format("2006-01-02 15:04:05"),
+			"req_id":   rID,
+			"uri":      ac.Request.RequestURI,
 		})
 	}
 }
 
 func (ac *ActiveContext) ParamsLog(params interface{}) {
-	if ac.Logger == nil {
-		return
-	}
 	rid := middleware.GetReqID(ac.Context)
 	uri := ac.Request.RequestURI
-	log.ParamsLog(rid, uri, params)
+	ac.Logger.ParamsWithFields(params, map[string]interface{}{
+		"datetime": time.Now().Format("2006-01-02 15:04:05"),
+		"req_id":   rid,
+		"uri":      uri,
+	})
 }
 
 type LogrusLogger struct {
@@ -48,15 +53,15 @@ type LogrusLogger struct {
 func (l *LogrusLogger) ErrorWithFields(e error, f map[string]interface{}) {
 	f["msg"] = e.Error()
 	logrusF := logrus.Fields(f)
-	Logger.WithFields(logrusF).Error("error")
+	l.Logger.WithFields(logrusF).Error("error")
 }
 
 func (l *LogrusLogger) InfoWithFields(msg string, f map[string]interface{}) {
 	logrusF := logrus.Fields(f)
-	Logger.WithFields(logrusF).Info(msg)
+	l.Logger.WithFields(logrusF).Info(msg)
 }
 
-func (l *LogrusLogger) ParamsLog(params interface{}) {
+func (l *LogrusLogger) ParamsWithFields(params interface{}, f map[string]interface{}) {
 	var pstr string
 	pb, err := json.Marshal(params)
 	if err != nil {
@@ -65,10 +70,6 @@ func (l *LogrusLogger) ParamsLog(params interface{}) {
 		pstr = string(pb)
 	}
 
-	l.Logger.WithFields(logrus.Fields{
-		"datetime": time.Now().Format("2006-01-02 15:04:05"),
-		"req_id":   rid,
-		"uri":      uri,
-		"params":   pstr,
-	}).Info("params_log")
+	f["params"] = pstr
+	l.Logger.WithFields(logrus.Fields(f)).Info("params_log")
 }

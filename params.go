@@ -1,5 +1,11 @@
 package activecontext
 
+import (
+	"encoding/json"
+
+	"github.com/goji/param"
+)
+
 func (ac *ActiveContext) GetQueryParam(key string) string {
 	return ac.Request.URL.Query().Get(key)
 }

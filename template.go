@@ -7,8 +7,8 @@ import (
 	"github.com/yosssi/ace"
 )
 
-func (ac *ActiveContext) RenderTemplate(data interface{}, paths []string) error {
-	tpl, err := ac.Template.Load(basePath, innerPath, a.Options)
+func (ac *ActiveContext) RenderTemplate(data interface{}, paths ...string) error {
+	tpl, err := ac.Template.Load(paths...)
 	if err != nil {
 		ac.ErrorLog(err)
 		return err
@@ -18,36 +18,34 @@ func (ac *ActiveContext) RenderTemplate(data interface{}, paths []string) error 
 		ac.ErrorLog(err)
 		return err
 	}
+
+	return nil
 }
 
 var TemplatePath500 = "views/error/500"
 var TemplatePath404 = "views/error/404"
 var TemplatePath403 = "views/error/403"
 
-func (ac *ActiveContext) Render500() {
-	ac.Template.Render(TemplatePath500, "", nil)
+func (ac *ActiveContext) Render500(data interface{}) {
+	ac.RenderTemplate(data, TemplatePath500)
 }
 
-func (ac *ActiveContext) Render404() {
-	ac.Template.Render(TemplatePath404, "", nil)
+func (ac *ActiveContext) Render404(data interface{}) {
+	ac.RenderTemplate(data, TemplatePath404)
 }
 
-func (ac *ActiveContext) Render403() {
-	ac.Template.Render(TemplatePath403, "", nil)
+func (ac *ActiveContext) Render403(data interface{}) {
+	ac.RenderTemplate(data, TemplatePath403)
 }
 
 type AceRenderer struct {
-	Options map[string]interface{}
+	Options ace.Options
 }
 
-func (a *AceRender) GetOptions(paths []string) {
-	return ace.Options(a.Options)
+func (a *AceRenderer) Load(paths []string) (*template.Template, error) {
+	return ace.Load(paths[0], paths[1], &a.Options)
 }
 
-func (a *AceRender) Load(paths []string) (*template.Template, error) {
-	return ace.Load(paths[0], paths[1], a.Options)
-}
-
-func (a *AceRender) Execute(t *template.Template, w io.Writer, data interface{}) {
+func (a *AceRenderer) Execute(t *template.Template, w io.Writer, data interface{}) error {
 	return t.Execute(w, data)
 }
