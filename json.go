@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (ac *ActiveContext) Json(d interface{}) {
+func (ac *ActiveContext) Json(d interface{}, status int) {
 	json, err := json.Marshal(d)
 	if err != nil {
 		http.Error(ac.Writer, err.Error(), http.StatusInternalServerError)
@@ -13,21 +13,6 @@ func (ac *ActiveContext) Json(d interface{}) {
 	}
 
 	ac.Writer.Header().Set("Content-Type", "application/json")
+	ac.Writer.WriteHeader(status)
 	ac.Writer.Write(json)
-}
-
-func (ac *ActiveContext) ErrorJson(e interface{}) {
-	ej := map[string]interface{}{
-		"status":  "error",
-		"message": e,
-	}
-	ac.Json(ej)
-}
-
-func (ac *ActiveContext) SuccessJson(d interface{}) {
-	sj := map[string]interface{}{
-		"status": "success",
-		"data":   d,
-	}
-	ac.Json(sj)
 }
