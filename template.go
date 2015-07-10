@@ -42,8 +42,14 @@ type AceRenderer struct {
 	Options ace.Options
 }
 
-func (a *AceRenderer) Load(paths []string) (*template.Template, error) {
-	return ace.Load(paths[0], paths[1], &a.Options)
+func (a *AceRenderer) Load(paths ...string) (*template.Template, error) {
+	var base, inner string
+	if len(paths) > 0 {
+		base = paths[0]
+	} else if len(paths) > 1 {
+		inner = paths[1]
+	}
+	return ace.Load(base, inner, &a.Options)
 }
 
 func (a *AceRenderer) Execute(t *template.Template, w io.Writer, data interface{}) error {
